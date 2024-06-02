@@ -21,9 +21,10 @@ import * as Dash from 'resource:///org/gnome/shell/ui/dash.js';
 import * as AppDisplay from 'resource:///org/gnome/shell/ui/appDisplay.js';
 import * as AppFavorites from 'resource:///org/gnome/shell/ui/appFavorites.js';
 //const AppMenu = Main.panel.statusArea.appMenu;
+//const Main = Shell.Main;
 const PanelBox = Main.layoutManager.panelBox;
 const WM = global.workspace_manager;
-import * as Util from 'resource:///org/gnome/shell/misc/util.js';
+//import * as Utils from 'resource:///org/gnome/shell/misc/util.js';
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 // translation needed to restore Places label, if any
@@ -381,8 +382,9 @@ class WorkspacesBar extends PanelMenu.Button {
 		if (!icon || icon.get_style_class_name() == 'fallback-app-icon') {
 			icon = new St.Icon({icon_name: FALLBACK_ICON_NAME, icon_size: ICON_SIZE});
 			// Attempt to use the window icon in place of the app's icon.
-			let textureCache = St.TextureCache.get_default();
-			icon.set_gicon(textureCache.bind_cairo_surface_property(w, 'icon'));
+			//let textureCache = St.TextureCache.get_default();
+			//icon.set_gicon(textureCache.bind_cairo_surface_property(w, 'icon'));
+			//icon.set_gicon(textureCache.load_file_to_cairo_surface(w));
 		}
 		return icon;
 	}
@@ -678,8 +680,8 @@ export default class BBExtension extends Extension {
 		// Register callbacks to be notified about changes
 		//HGS Changed to use internal wrapper for MonitorManager.get to work under Gnome 44
 		let monitorManager = getMonitorManager();
-		this._monitorsChanged = monitorManager.connect('monitors-changed', () => this.set_panel_position());
-		this._panelHeightChanged = PanelBox.connect("notify::height", () => this.set_panel_position());
+		//this._monitorsChanged = monitorManager.connect('monitors-changed', () => this.set_panel_position());
+		//this._panelHeightChanged = PanelBox.connect("notify::height", () => this.set_panel_position());
 	}
 
 	destroy() {
@@ -737,19 +739,34 @@ export default class BBExtension extends Extension {
     	}*/
     }    
     
-    // toggle Activities button
+/*    // toggle Activities button
 	_show_activities(show) {
-		this.activities_button = Main.panel.statusArea['activities'];
-		if (this.activities_button) {
+		let activitiesButton = Main.panel.statusArea['activities'];
+		if (activitiesButton) {
 			if (show && !Main.sessionMode.isLocked) {
-				this.activities_button.container.show();
+				activitiesButton.show();
 			} else {
-				this.activities_button.container.hide();
+				activitiesButton.hide();
 			}
 		}
 	}
+*/
+
+/*	// toggle Activities button
+_show_activities(show) {
+    const activitiesButton = Main.panel.statusArea['activities'];
+    if (activitiesButton) {
+        if (show && !Main.sessionMode.isLocked) {
+            activitiesButton.container.show();
+        } else {
+           activitiesButton.container.hide(); 
+        }
+    }
+}
+*/
+
 	
-	// toggle Places Status Indicator extension label to folder	
+	/* // toggle Places Status Indicator extension label to folder	
 	_show_places_icon(show_icon) {
 		this.places_indicator = Main.panel.statusArea['places-menu'];
 		if (this.places_indicator) {
@@ -762,7 +779,7 @@ export default class BBExtension extends Extension {
 				this.places_indicator.add_child(this.places_label);
 			}
 		}
-	}
+	} */
 	
 	// toggle dash in overview
 	_show_dash(show) {
@@ -773,7 +790,7 @@ export default class BBExtension extends Extension {
 		}
 	}
 
-	// set panel poistion according to the settings
+	/*// set panel poistion according to the settings
 	set_panel_position() {
 		if (BOTTOM_PANEL) {
 			let monitor = Main.layoutManager.primaryMonitor;
@@ -782,34 +799,48 @@ export default class BBExtension extends Extension {
 			this.reset_panel_position()
 		}
 	}
+	*/
+
+/*	// set panel poistion according to the settings
+	set_panel_position() {
+		if (BOTTOM_PANEL) {
+			let monitor = Main.layoutManager.monitors[Main.layoutManager.primaryIndex];
+    		Main.panelController.set_position(monitor.x, (monitor.y + monitor.height - Main.panelController.actor.height));
+		} else {
+			this.reset_panel_position()
+		}
+	}
 
 	// restore panel position to the top
 	reset_panel_position() {
-		let monitor = Main.layoutManager.primaryMonitor;
-        PanelBox.set_position(monitor.x, monitor.y);
+		let monitor = Main.layoutManager.monitors[Main.layoutManager.primaryIndex];
+        Main.panelController.set_position(monitor.x, monitor.y);
 	}
+	*/
 	
-	// toggle workspaces thumbnails in overview
+	/*// toggle workspaces thumbnails in overview
 	_hide_ws_thumbnails() {
 		Main.overview._overview._controls._thumbnailsBox.hide();
 	}
+	*/
 
     enable() {    
 		// get settings
     	this._get_settings();
 
     	// adjust panel position to top or bottom edge of the screen
-    	this.set_panel_position();
+    	//this.set_panel_position();
 
 		// top panel left box padding
     	if (REDUCE_PADDING) {
     		Main.panel._leftBox.add_style_class_name('leftbox-reduced-padding');
     	}
     
-    	// Activities button
+    	/*// Activities button
     	if (!DISPLAY_ACTIVITIES) {
     		this._show_activities(false);
     	}
+		*/
     	
     	// app grid
 		if (DISPLAY_APP_GRID) {
@@ -817,11 +848,11 @@ export default class BBExtension extends Extension {
 			Main.panel.addToStatusArea('babar-app-grid-button', this.app_grid, 0, 'left');
 		}
 		
-		// Places label to icon
+	/* 	// Places label to icon
 		if (DISPLAY_PLACES_ICON) {
 			this._show_places_icon(true);
 			this.extensions_changed = Main.extensionManager.connect('extension-state-changed', () => this._show_places_icon(true));
-		}
+		} */
 		
 		// favorites
 		if (DISPLAY_FAVORITES) {
@@ -845,10 +876,11 @@ export default class BBExtension extends Extension {
 			this._show_dash(false);
 		}
 		
-		// workspaces thumbnails
+		/*  // workspaces thumbnails
 		if (!DISPLAY_WORKSPACES_THUMBNAILS) {
 			this.showing_overview = Main.overview.connect('showing', this._hide_ws_thumbnails.bind(this));
 		}
+		*/
     }
 
     disable() {
@@ -873,16 +905,18 @@ export default class BBExtension extends Extension {
     	}
 
     	// restore panel position
-    	this.reset_panel_position();
+    	//this.reset_panel_position();
     	
-    	// Places label and unwatch extensions changes
+    	/* // Places label and unwatch extensions changes
     	if (DISPLAY_PLACES_ICON && this.places_indicator) {
     		this._show_places_icon(false);
     		Main.extensionManager.disconnect(this.extensions_changed);
     	}
-    	
-    	// Activities button
+    	 */
+
+    	/*// Activities button
     	this._show_activities(true);
+		*/
     	
     	// AppMenu icon
     	// if (!Main.overview.visible && !Main.sessionMode.isLocked) {
@@ -892,11 +926,12 @@ export default class BBExtension extends Extension {
 		// dash
 		this._show_dash(true);
 		
-		// workspaces thumbnails
+		/* // workspaces thumbnails
 		if (!DISPLAY_WORKSPACES_THUMBNAILS && this.showing_overview) {
 			Main.overview.disconnect(this.showing_overview);
 		}
-		
+		 */
+
 		// unwatch settings
 		this.settings.disconnect(this.settings_changed);
     }
