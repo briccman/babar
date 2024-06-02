@@ -4,6 +4,12 @@
 	Contributors: @fthx, @wooque, @frandieguez, @kenoh, @justperfection
 	License GPL v3
 */
+/* 
+	BaBar
+	(c) Brian Hanks 2024 
+	Contributors: @briccman
+	License GPL v3
+*/
 
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
@@ -20,11 +26,8 @@ import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Dash from 'resource:///org/gnome/shell/ui/dash.js';
 import * as AppDisplay from 'resource:///org/gnome/shell/ui/appDisplay.js';
 import * as AppFavorites from 'resource:///org/gnome/shell/ui/appFavorites.js';
-//const AppMenu = Main.panel.statusArea.appMenu;
-//const Main = Shell.Main;
 const PanelBox = Main.layoutManager.panelBox;
 const WM = global.workspace_manager;
-//import * as Utils from 'resource:///org/gnome/shell/misc/util.js';
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 // translation needed to restore Places label, if any
@@ -40,7 +43,6 @@ var RIGHT_CLICK = true;
 var MIDDLE_CLICK = true;
 var REDUCE_PADDING = true;
 var APP_GRID_ICON_NAME = 'view-app-grid-symbolic';
-var PLACES_ICON_NAME = 'folder-symbolic';
 var FAVORITES_ICON_NAME = 'starred-symbolic';
 var FALLBACK_ICON_NAME = 'applications-system-symbolic';
 var ICON_SIZE = 18;
@@ -52,17 +54,12 @@ var HIDDEN_OPACITY = 127;
 var UNFOCUSED_OPACITY = 255;
 var FOCUSED_OPACITY = 255;
 var DESATURATE_ICONS = false;
-var BOTTOM_PANEL = false;
 var FAVORITES_FIRST = false;
-var DISPLAY_ACTIVITIES = false;
 var DISPLAY_APP_GRID = true;
-var DISPLAY_PLACES_ICON = true;
 var DISPLAY_FAVORITES = true;
 var DISPLAY_WORKSPACES = true;
 var DISPLAY_TASKS = true;
-var DISPLAY_APP_MENU = false;
 var DISPLAY_DASH = true;
-var DISPLAY_WORKSPACES_THUMBNAILS = true;
 
 let extension;
 
@@ -192,8 +189,6 @@ class WorkspacesBar extends PanelMenu.Button {
 		this._active_ws_changed = WM.connect('active-workspace-changed', this._update_ws.bind(this));
 		this._windows_changed = this.window_tracker.connect('tracked-windows-changed', this._update_ws.bind(this));
 		this._restacked = global.display.connect('restacked', this._update_ws.bind(this));
-		//this._window_left_monitor = global.display.connect('window-left-monitor', this._update_ws.bind(this));
-		//this._window_entered_monitor = global.display.connect('window-entered-monitor', this._update_ws.bind(this));
 	}
 
 	// remove signals, restore Activities button, destroy workspaces bar
@@ -217,14 +212,6 @@ class WorkspacesBar extends PanelMenu.Button {
 		if (this._restacked) {
 			global.display.disconnect(this._restacked);
 		}
-
-		//if (this._window_left_monitor) {
-		//	global.display.disconnect(this._window_left_monitor);
-		//}
-
-		//if (this._window_entered_monitor) {
-		//	global.display.disconnect(this._window_entered_monitor);
-		//}
 
 		if (this.hide_tooltip_timeout) {
 			GLib.source_remove(this.hide_tooltip_timeout);
@@ -381,10 +368,6 @@ class WorkspacesBar extends PanelMenu.Button {
 		// sometimes no icon is defined or icon is void, at least for a short time
 		if (!icon || icon.get_style_class_name() == 'fallback-app-icon') {
 			icon = new St.Icon({icon_name: FALLBACK_ICON_NAME, icon_size: ICON_SIZE});
-			// Attempt to use the window icon in place of the app's icon.
-			//let textureCache = St.TextureCache.get_default();
-			//icon.set_gicon(textureCache.bind_cairo_surface_property(w, 'icon'));
-			//icon.set_gicon(textureCache.load_file_to_cairo_surface(w));
 		}
 		return icon;
 	}
@@ -680,8 +663,6 @@ export default class BBExtension extends Extension {
 		// Register callbacks to be notified about changes
 		//HGS Changed to use internal wrapper for MonitorManager.get to work under Gnome 44
 		let monitorManager = getMonitorManager();
-		//this._monitorsChanged = monitorManager.connect('monitors-changed', () => this.set_panel_position());
-		//this._panelHeightChanged = PanelBox.connect("notify::height", () => this.set_panel_position());
 	}
 
 	destroy() {
@@ -703,7 +684,6 @@ export default class BBExtension extends Extension {
 		MIDDLE_CLICK = this.settings.get_boolean('middle-click');
 		REDUCE_PADDING = this.settings.get_boolean('reduce-padding');
 		APP_GRID_ICON_NAME = this.settings.get_string('app-grid-icon-name');
-		PLACES_ICON_NAME = this.settings.get_string('places-icon-name');
 		FAVORITES_ICON_NAME = this.settings.get_string('favorites-icon-name');
 		FALLBACK_ICON_NAME = this.settings.get_string('fallback-icon-name');
 		ICON_SIZE = this.settings.get_int('icon-size');
@@ -715,17 +695,12 @@ export default class BBExtension extends Extension {
 		UNFOCUSED_OPACITY = this.settings.get_int('unfocused-opacity');
 		FOCUSED_OPACITY = this.settings.get_int('focused-opacity');
 		DESATURATE_ICONS = this.settings.get_boolean('desaturate-icons');
-		BOTTOM_PANEL = this.settings.get_boolean('bottom-panel');
 		FAVORITES_FIRST = this.settings.get_boolean('favorites-first');
-		DISPLAY_ACTIVITIES = this.settings.get_boolean('display-activities');
 		DISPLAY_APP_GRID = this.settings.get_boolean('display-app-grid');
-		DISPLAY_PLACES_ICON = this.settings.get_boolean('display-places-icon');
 		DISPLAY_FAVORITES = this.settings.get_boolean('display-favorites');
 		DISPLAY_WORKSPACES = this.settings.get_boolean('display-workspaces');
 		DISPLAY_TASKS = this.settings.get_boolean('display-tasks');
-		DISPLAY_APP_MENU = this.settings.get_boolean('display-app-menu');
 		DISPLAY_DASH = this.settings.get_boolean('display-dash');
-		DISPLAY_WORKSPACES_THUMBNAILS = this.settings.get_boolean('display-workspaces-thumbnails');
     }
     
     // restart extension after settings changed
@@ -739,48 +714,6 @@ export default class BBExtension extends Extension {
     	}*/
     }    
     
-/*    // toggle Activities button
-	_show_activities(show) {
-		let activitiesButton = Main.panel.statusArea['activities'];
-		if (activitiesButton) {
-			if (show && !Main.sessionMode.isLocked) {
-				activitiesButton.show();
-			} else {
-				activitiesButton.hide();
-			}
-		}
-	}
-*/
-
-/*	// toggle Activities button
-_show_activities(show) {
-    const activitiesButton = Main.panel.statusArea['activities'];
-    if (activitiesButton) {
-        if (show && !Main.sessionMode.isLocked) {
-            activitiesButton.container.show();
-        } else {
-           activitiesButton.container.hide(); 
-        }
-    }
-}
-*/
-
-	
-	/* // toggle Places Status Indicator extension label to folder	
-	_show_places_icon(show_icon) {
-		this.places_indicator = Main.panel.statusArea['places-menu'];
-		if (this.places_indicator) {
-			this.places_indicator.remove_child(this.places_indicator.get_first_child());
-			if (show_icon) {
-				this.places_icon = new St.Icon({icon_name: PLACES_ICON_NAME, style_class: 'system-status-icon'});
-				this.places_indicator.add_child(this.places_icon);
-			} else {
-				this.places_label = new St.Label({text: _('Places'), y_expand: true, y_align: Clutter.ActorAlign.CENTER});
-				this.places_indicator.add_child(this.places_label);
-			}
-		}
-	} */
-	
 	// toggle dash in overview
 	_show_dash(show) {
 		if (show) {
@@ -790,69 +723,21 @@ _show_activities(show) {
 		}
 	}
 
-	/*// set panel poistion according to the settings
-	set_panel_position() {
-		if (BOTTOM_PANEL) {
-			let monitor = Main.layoutManager.primaryMonitor;
-    		PanelBox.set_position(monitor.x, (monitor.x + monitor.height - PanelBox.height));
-		} else {
-			this.reset_panel_position()
-		}
-	}
-	*/
-
-/*	// set panel poistion according to the settings
-	set_panel_position() {
-		if (BOTTOM_PANEL) {
-			let monitor = Main.layoutManager.monitors[Main.layoutManager.primaryIndex];
-    		Main.panelController.set_position(monitor.x, (monitor.y + monitor.height - Main.panelController.actor.height));
-		} else {
-			this.reset_panel_position()
-		}
-	}
-
-	// restore panel position to the top
-	reset_panel_position() {
-		let monitor = Main.layoutManager.monitors[Main.layoutManager.primaryIndex];
-        Main.panelController.set_position(monitor.x, monitor.y);
-	}
-	*/
-	
-	/*// toggle workspaces thumbnails in overview
-	_hide_ws_thumbnails() {
-		Main.overview._overview._controls._thumbnailsBox.hide();
-	}
-	*/
 
     enable() {    
 		// get settings
     	this._get_settings();
-
-    	// adjust panel position to top or bottom edge of the screen
-    	//this.set_panel_position();
 
 		// top panel left box padding
     	if (REDUCE_PADDING) {
     		Main.panel._leftBox.add_style_class_name('leftbox-reduced-padding');
     	}
     
-    	/*// Activities button
-    	if (!DISPLAY_ACTIVITIES) {
-    		this._show_activities(false);
-    	}
-		*/
-    	
     	// app grid
 		if (DISPLAY_APP_GRID) {
 			this.app_grid = new AppGridButton();
 			Main.panel.addToStatusArea('babar-app-grid-button', this.app_grid, 0, 'left');
 		}
-		
-	/* 	// Places label to icon
-		if (DISPLAY_PLACES_ICON) {
-			this._show_places_icon(true);
-			this.extensions_changed = Main.extensionManager.connect('extension-state-changed', () => this._show_places_icon(true));
-		} */
 		
 		// favorites
 		if (DISPLAY_FAVORITES) {
@@ -866,21 +751,11 @@ _show_activities(show) {
 			Main.panel.addToStatusArea('babar-workspaces-bar', this.workspaces_bar, 5, 'left');
 		}
 		
-		// AppMenu
-    	// if (!DISPLAY_APP_MENU) {
-		// 	AppMenu.container.hide();
-		// }
-		
 		// dash
 		if (!DISPLAY_DASH) {
 			this._show_dash(false);
 		}
 		
-		/*  // workspaces thumbnails
-		if (!DISPLAY_WORKSPACES_THUMBNAILS) {
-			this.showing_overview = Main.overview.connect('showing', this._hide_ws_thumbnails.bind(this));
-		}
-		*/
     }
 
     disable() {
@@ -904,34 +779,9 @@ _show_activities(show) {
     		Main.panel._leftBox.remove_style_class_name('leftbox-reduced-padding');
     	}
 
-    	// restore panel position
-    	//this.reset_panel_position();
-    	
-    	/* // Places label and unwatch extensions changes
-    	if (DISPLAY_PLACES_ICON && this.places_indicator) {
-    		this._show_places_icon(false);
-    		Main.extensionManager.disconnect(this.extensions_changed);
-    	}
-    	 */
-
-    	/*// Activities button
-    	this._show_activities(true);
-		*/
-    	
-    	// AppMenu icon
-    	// if (!Main.overview.visible && !Main.sessionMode.isLocked) {
-		// 	AppMenu.container.show();
-		// }
-		
 		// dash
 		this._show_dash(true);
 		
-		/* // workspaces thumbnails
-		if (!DISPLAY_WORKSPACES_THUMBNAILS && this.showing_overview) {
-			Main.overview.disconnect(this.showing_overview);
-		}
-		 */
-
 		// unwatch settings
 		this.settings.disconnect(this.settings_changed);
     }

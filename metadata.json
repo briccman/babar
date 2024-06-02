@@ -2,8 +2,8 @@
   "description": "Task bar. App grid, favorites, workspaces and tasks in panel.\n\n Drag and drop favorite, task, dash item or app grid item to any workspace (you cannot reorder tasks inside a workspace). Change Places label to an icon.\n\n  Edit the string array 'org.gnome.desktop.wm.preferences.workspace-names' gsettings key (through dconf editor, e.g.).\n\n Changelog: https://github.com/BriRE/babar/issues/2", 
   "name": "BaBar Task Bar", 
   "shell-version": ["45","46"], 
-  "url": "https://github.com/fthx/babar", 
-  "uuid": "babar@fthx", 
+  "url": "https://github.com/briccman/babar", 
+  "uuid": "babar@briccman", 
   "version": 62,
   "gettext-domain": "babar",
   "settings-schema": "org.gnome.shell.extensions.babar"
