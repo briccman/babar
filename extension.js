@@ -679,23 +679,15 @@ export default class BBExtension extends Extension {
         this.settings_already_changed = false;
 		this.settings_changed = this.settings.connect('changed', this._settings_changed.bind(this));
 		
-		WORKSPACES_RIGHT_CLICK = this.settings.get_boolean('workspaces-right-click');
-		RIGHT_CLICK = this.settings.get_boolean('right-click');
-		MIDDLE_CLICK = this.settings.get_boolean('middle-click');
 		REDUCE_PADDING = this.settings.get_boolean('reduce-padding');
 		APP_GRID_ICON_NAME = this.settings.get_string('app-grid-icon-name');
 		FAVORITES_ICON_NAME = this.settings.get_string('favorites-icon-name');
 		FALLBACK_ICON_NAME = this.settings.get_string('fallback-icon-name');
 		ICON_SIZE = this.settings.get_int('icon-size');
-		THUMBNAIL_MAX_SIZE = this.settings.get_int('thumbnail-max-size');
-		ROUNDED_WORKSPACES_BUTTONS = this.settings.get_boolean('rounded-workspaces-buttons');
-		PLAIN_WORKSPACES_BUTTONS = this.settings.get_boolean('plain-workspaces-buttons');
 		TOOLTIP_VERTICAL_PADDING = this.settings.get_int('tooltip-vertical-padding');
 		HIDDEN_OPACITY = this.settings.get_int('hidden-opacity');
 		UNFOCUSED_OPACITY = this.settings.get_int('unfocused-opacity');
 		FOCUSED_OPACITY = this.settings.get_int('focused-opacity');
-		DESATURATE_ICONS = this.settings.get_boolean('desaturate-icons');
-		FAVORITES_FIRST = this.settings.get_boolean('favorites-first');
 		DISPLAY_APP_GRID = this.settings.get_boolean('display-app-grid');
 		DISPLAY_FAVORITES = this.settings.get_boolean('display-favorites');
 		DISPLAY_WORKSPACES = this.settings.get_boolean('display-workspaces');
