@@ -21,7 +21,8 @@ import {gettext as _} from 'gettext';
 
 
 export default class BabarPreferences extends ExtensionPreferences {
-	fillPreferencesWindow(window) {
+    // Converted function to async for Gnome 47
+	async fillPreferencesWindow(window) {
 		window._settings = this.getSettings('org.gnome.shell.extensions.babar');
 
 		const page = new Adw.PreferencesPage({

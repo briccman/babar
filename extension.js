@@ -11,6 +11,9 @@
 	License GPL v3
 */
 
+// Cogl & GtkNotificationDaemonAppSource - Needed for Gnome 47 but not used.
+//import Cogl from 'gi://Cogl';  #Needed for Gnome 47 but not used
+//import GtkNotificationDaemonAppSource from 'resource://org/gnome/shell/ui/notificationDaemon.js'  #Needed for Gnome 47 but not used
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
@@ -332,7 +335,8 @@ class WorkspacesBar extends PanelMenu.Button {
 			
 			// desaturate option
 			if (DESATURATE_ICONS) {
-				this.desaturate = new Clutter.DesaturateEffect();
+				//Moved to St for Gnome 47
+				this.desaturate = new St.DesaturateEffect();
 				w_box_icon.add_effect(this.desaturate);
 			}
 		    
