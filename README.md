@@ -1,4 +1,4 @@
-** This version runs – at least for me – on Gnome ["45","46"].  NOT Compatible with Gnome <45. 
+** This version runs – at least for me – on Gnome ["46", "47"].  Tested on Fedora 40 & Fedora 41.  NOT Compatible with Gnome <45. 
 
 NOTE: Settings are functional again, but several have been removed either because it wasn't important to me or I just didn't understand the intent of the option.
 
